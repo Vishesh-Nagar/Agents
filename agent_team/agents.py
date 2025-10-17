@@ -1,5 +1,8 @@
 # @title Define the Weather Agent
 # Use one of the model constants defined earlier
+from agent_team.config import MODEL_GEMINI_2_0_FLASH
+from agent_team.tools import get_weather, get_account_details, say_hello, say_goodbye
+from google.adk.agents import Agent
 AGENT_MODEL = MODEL_GEMINI_2_0_FLASH # Starting with Gemini
 
 weather_agent = Agent(
@@ -15,6 +18,21 @@ weather_agent = Agent(
 )
 
 print(f"Agent '{weather_agent.name}' created using model '{AGENT_MODEL}'.")
+
+# @title Define the Account Agent
+account_agent = Agent(
+    name="account_agent_v1",
+    model=AGENT_MODEL,
+    description="Provides account details for specific account IDs.",
+    instruction="You are a helpful account assistant. "
+                "When the user asks for account details with an account ID, "
+                "use the 'get_account_details' tool to retrieve the information. "
+                "If the tool returns an error, inform the user politely. "
+                "If the tool is successful, present the account details clearly.",
+    tools=[get_account_details],
+)
+
+print(f"Agent '{account_agent.name}' created using model '{AGENT_MODEL}'.")
 
 # @title Define Greeting and Farewell Sub-Agents
 
@@ -68,39 +86,41 @@ except Exception as e:
 root_agent = None
 runner_root = None # Initialize runner
 
-if greeting_agent and farewell_agent and 'get_weather' in globals():
+if greeting_agent and farewell_agent and 'get_weather' in globals() and 'get_account_details' in globals():
     # Let's use a capable Gemini model for the root agent to handle orchestration
     root_agent_model = MODEL_GEMINI_2_0_FLASH
 
     weather_agent_team = Agent(
         name="weather_agent_v2", # Give it a new version name
         model=root_agent_model,
-        description="The main coordinator agent. Handles weather requests and delegates greetings/farewells to specialists.",
-        instruction="You are the main Weather Agent coordinating a team. Your primary responsibility is to provide weather information. "
+        description="The main coordinator agent. Handles weather and account requests, delegates greetings/farewells to specialists.",
+        instruction="You are the main Agent coordinating a team. Your primary responsibilities are to provide weather information and account details. "
                     "Use the 'get_weather' tool ONLY for specific weather requests (e.g., 'weather in London'). "
+                    "Use the 'get_account_details' tool ONLY for account inquiries (e.g., 'account details for acc123'). "
                     "You have specialized sub-agents: "
                     "1. 'greeting_agent': Handles simple greetings like 'Hi', 'Hello'. Delegate to it for these. "
                     "2. 'farewell_agent': Handles simple farewells like 'Bye', 'See you'. Delegate to it for these. "
                     "Analyze the user's query. If it's a greeting, delegate to 'greeting_agent'. If it's a farewell, delegate to 'farewell_agent'. "
                     "If it's a weather request, handle it yourself using 'get_weather'. "
+                    "If it's an account request, handle it yourself using 'get_account_details'. "
                     "For anything else, respond appropriately or state you cannot handle it.",
-        tools=[get_weather], # Root agent still needs the weather tool for its core task
+        tools=[get_weather, get_account_details], # Root agent needs both tools for its core tasks
         # Key change: Link the sub-agents here!
         sub_agents=[greeting_agent, farewell_agent]
     )
     print(f"✅ Root Agent '{weather_agent_team.name}' created using model '{root_agent_model}' with sub-agents: {[sa.name for sa in weather_agent_team.sub_agents]}")
 
 else:
-    print("❌ Cannot create root agent because one or more sub-agents failed to initialize or 'get_weather' tool is missing.")
+    print("❌ Cannot create root agent because one or more sub-agents failed to initialize or tools are missing.")
     if not greeting_agent: print(" - Greeting Agent is missing.")
     if not farewell_agent: print(" - Farewell Agent is missing.")
     if 'get_weather' not in globals(): print(" - get_weather function is missing.")
+    if 'get_account_details' not in globals(): print(" - get_account_details function is missing.")
 
 # @title 3. Redefine Sub-Agents and Update Root Agent with output_key
 
-# Ensure necessary imports: Agent, LiteLlm, Runner
+# Ensure necessary imports: Agent, Runner
 from google.adk.agents import Agent
-from google.adk.models.lite_llm import LiteLlm
 from google.adk.runners import Runner
 # Ensure tools 'say_hello', 'say_goodbye' are defined (from Step 3)
 # Ensure model constants MODEL_GPT_4O, MODEL_GEMINI_2_0_FLASH etc. are defined

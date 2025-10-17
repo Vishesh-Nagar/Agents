@@ -65,6 +65,58 @@ print(say_hello("Alice"))
 print(say_hello()) # Test with no argument (should use default "Hello there!")
 print(say_hello(name=None)) # Test with name explicitly as None (should use default "Hello there!")
 
+# @title Define Account Details Tool
+def get_account_details(account_id: str) -> dict:
+    """Retrieves account details for a given account ID.
+
+    Args:
+        account_id (str): The account ID to look up.
+
+    Returns:
+        dict: Account information including status, balance, and holder name.
+    """
+    print(f"--- Tool: get_account_details called for account_id: {account_id} ---")
+
+    # Mock account data
+    mock_accounts_db = {
+        "acc123": {
+            "status": "success",
+            "account_holder": "John Doe",
+            "balance": 2500.50,
+            "account_type": "Savings",
+            "last_transaction": "2024-01-15"
+        },
+        "acc456": {
+            "status": "success",
+            "account_holder": "Jane Smith",
+            "balance": 15000.75,
+            "account_type": "Checking",
+            "last_transaction": "2024-01-20"
+        },
+        "acc789": {
+            "status": "success",
+            "account_holder": "Bob Johnson",
+            "balance": 500.00,
+            "account_type": "Savings",
+            "last_transaction": "2024-01-10"
+        }
+    }
+
+    if account_id in mock_accounts_db:
+        data = mock_accounts_db[account_id]
+        report = f"Account Details for {account_id}:\n" \
+                f"Holder: {data['account_holder']}\n" \
+                f"Type: {data['account_type']}\n" \
+                f"Balance: ${data['balance']:.2f}\n" \
+                f"Last Transaction: {data['last_transaction']}"
+        return {"status": "success", "report": report}
+    else:
+        return {"status": "error", "error_message": f"Account '{account_id}' not found."}
+
+print("Account details tool defined.")
+print(get_account_details("acc123"))
+print(get_account_details("invalid"))
+
 from google.adk.tools.tool_context import ToolContext
 
 def get_weather_stateful(city: str, tool_context: ToolContext) -> dict:
@@ -113,3 +165,64 @@ def get_weather_stateful(city: str, tool_context: ToolContext) -> dict:
         return {"status": "error", "error_message": error_msg}
 
 print("✅ State-aware 'get_weather_stateful' tool defined.")
+
+def get_account_details_stateful(account_id: str, tool_context: ToolContext) -> dict:
+    """Retrieves account details, with state-aware formatting."""
+    print(f"--- Tool: get_account_details_stateful called for {account_id} ---")
+
+    # Read user preference for currency display
+    preferred_currency = tool_context.state.get("user_preference_currency", "USD")
+
+    # Mock account data
+    mock_accounts_db = {
+        "acc123": {
+            "account_holder": "John Doe",
+            "balance_usd": 2500.50,
+            "account_type": "Savings",
+            "last_transaction": "2024-01-15"
+        },
+        "acc456": {
+            "account_holder": "Jane Smith",
+            "balance_usd": 15000.75,
+            "account_type": "Checking",
+            "last_transaction": "2024-01-20"
+        },
+        "acc789": {
+            "account_holder": "Bob Johnson",
+            "balance_usd": 500.00,
+            "account_type": "Savings",
+            "last_transaction": "2024-01-10"
+        }
+    }
+
+    if account_id in mock_accounts_db:
+        data = mock_accounts_db[account_id]
+        balance = data["balance_usd"]
+
+        # Format balance based on currency preference (dummy conversion)
+        if preferred_currency == "EUR":
+            balance = balance * 0.85  # Dummy EUR conversion
+            currency_symbol = "€"
+        else:
+            currency_symbol = "$"
+
+        report = f"Account Details for {account_id}:\n" \
+                f"Holder: {data['account_holder']}\n" \
+                f"Type: {data['account_type']}\n" \
+                f"Balance: {currency_symbol}{balance:.2f} {preferred_currency}\n" \
+                f"Last Transaction: {data['last_transaction']}"
+
+        result = {"status": "success", "report": report}
+        print(f"--- Tool: Generated account report in {preferred_currency}. Result: {result} ---")
+
+        # Update state
+        tool_context.state["last_account_checked"] = account_id
+        print(f"--- Tool: Updated state 'last_account_checked': {account_id} ---")
+
+        return result
+    else:
+        error_msg = f"Account '{account_id}' not found."
+        print(f"--- Tool: Account '{account_id}' not found. ---")
+        return {"status": "error", "error_message": error_msg}
+
+print("✅ State-aware 'get_account_details_stateful' tool defined.")

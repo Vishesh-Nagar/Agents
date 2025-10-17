@@ -1,17 +1,11 @@
 # @title Step 0: Setup and Installation
-# Install ADK
-# pip install google-adk -q
-
-print("Installation complete.")
-
 # @title Import necessary libraries
 import os
 import asyncio
 from google.adk.agents import Agent
-from google.adk.models.lite_llm import LiteLlm # For multi-model support
 from google.adk.sessions import InMemorySessionService
 from google.adk.runners import Runner
-from google.genai import types # For creating message Content/Parts
+from google.genai import types
 
 import warnings
 # Ignore all warnings
@@ -44,3 +38,17 @@ MODEL_GEMINI_2_0_FLASH = "gemini-2.0-flash"
 print("Gemini model set.")
 
 print("\nEnvironment configured.")
+
+# Define constants
+
+APP_NAME = "weather_tutorial_app"
+
+USER_ID = "user_1"
+
+SESSION_ID = "session_001"
+
+SESSION_ID_STATEFUL = "session_state_demo_001"
+
+USER_ID_STATEFUL = "user_state_demo"
+
+print("Constants defined.")

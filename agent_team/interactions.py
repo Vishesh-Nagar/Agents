@@ -1,6 +1,10 @@
 # @title Define Agent Interaction Function
 
 from google.genai import types # For creating message Content/Parts
+from google.adk.runners import Runner
+from google.adk.session_services import InMemorySessionService
+from agent_team.tools import get_weather, get_account_details, say_hello, say_goodbye
+from agent_team.agents import AGENT_MODEL, weather_agent, account_agent, greeting_agent, farewell_agent, weather_agent_team
 
 async def call_agent_async(query: str, runner, user_id, session_id):
   """Sends a query to the agent and prints the final response."""
@@ -31,8 +35,27 @@ async def call_agent_async(query: str, runner, user_id, session_id):
 
 # @title Run the Initial Conversation
 
+# Define variables for the conversation
+APP_NAME = "weather_tutorial"
+USER_ID = "user_1"
+SESSION_ID = "session_001"
+
+# Create session service and runner
+session_service = InMemorySessionService()
+runner = Runner(
+    agent=weather_agent,
+    app_name=APP_NAME,
+    session_service=session_service
+)
+
 # We need an async function to await our interaction helper
 async def run_conversation():
+    # Create session
+    session = await session_service.create_session(
+        app_name=APP_NAME, user_id=USER_ID, session_id=SESSION_ID
+    )
+    print(f"Session created: App='{APP_NAME}', User='{USER_ID}', Session='{SESSION_ID}'")
+
     await call_agent_async("What is the weather like in London?",
                                        runner=runner,
                                        user_id=USER_ID,
@@ -105,6 +128,10 @@ if root_agent_var_name in globals() and globals()[root_agent_var_name]:
                                user_id=USER_ID,
                                session_id=SESSION_ID)
         await call_agent_async(query = "What is the weather in New York?",
+                               runner=runner_agent_team,
+                               user_id=USER_ID,
+                               session_id=SESSION_ID)
+        await call_agent_async(query = "Can you give me account details for acc123?",
                                runner=runner_agent_team,
                                user_id=USER_ID,
                                session_id=SESSION_ID)
