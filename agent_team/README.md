@@ -4,7 +4,7 @@ This project implements a multi-agent weather assistant system using Google ADK 
 
 ## Project Structure
 
-The monolithic `main.py` has been refactored into modular components for better maintainability and scalability:
+The monolithic code has been refactored into modular components for better maintainability and scalability:
 
 ```
 agent_team/
@@ -15,8 +15,8 @@ agent_team/
 ├── sessions.py            # Session service setup and management
 ├── interactions.py        # Interaction functions and conversation logic
 ├── guardrails.py          # Guardrail callback functions
-├── main_refactored.py     # Main entry point
-├── main.py                # Original monolithic file (preserved)
+├── main.py                # Main entry point (refactored)
+├── main_full.py           # Full script version with all code inline
 ├── main.ipynb             # Jupyter notebook version
 └── requirements.txt       # Python dependencies
 ```
@@ -68,9 +68,13 @@ agent_team/
   - `block_keyword_guardrail()`: Blocks queries containing specific keywords
   - `block_paris_tool_guardrail()`: Blocks weather queries for specific cities
 
-### main_refactored.py
-- **Purpose**: Serves as the new main entry point for the application.
+### main.py
+- **Purpose**: Serves as the main entry point for the application.
 - **Function**: Imports from all modules and provides a simple interface to run the system.
+
+### main_full.py
+- **Purpose**: Contains the full monolithic script with all code inline.
+- **Function**: Self-contained version for easy execution without modular imports.
 
 ## System Initialization Flow
 
@@ -144,11 +148,11 @@ The system operates as a conversational AI assistant with the following capabili
 ### Running the System:
 ```bash
 cd agent_team
-python main_refactored.py
+python main.py
 ```
 
 ### Running Specific Conversations:
-Modify `main_refactored.py` to call desired conversation functions:
+Modify `main.py` to call desired conversation functions:
 - `run_conversation()`: Basic weather agent
 - `run_team_conversation()`: Multi-agent team
 - `run_stateful_conversation()`: State-aware interactions
@@ -169,8 +173,8 @@ See `requirements.txt` for Python package requirements. Key dependencies:
 
 ## Testing
 
-The refactored code maintains full compatibility with the original `main.py`. All conversation scenarios and edge cases should produce identical results. For testing:
-1. Compare outputs between `main.py` and `main_refactored.py`
+The refactored code maintains full compatibility with the original monolithic version. All conversation scenarios and edge cases should produce identical results. For testing:
+1. Compare outputs between `main.py` and `main_full.py`
 2. Verify state persistence across sessions
 3. Test guardrail blocking behavior
 4. Confirm sub-agent delegation works correctly
