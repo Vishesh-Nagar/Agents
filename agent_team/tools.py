@@ -1,31 +1,41 @@
 # Tool functions for agent interactions.
 
-from google.adk.tools.tool_context import ToolContext
+import os
+import requests
+from dotenv import load_dotenv
 from typing import Optional
 
+load_dotenv()
+
 def get_weather(city: str) -> dict:
-    """Retrieves the current weather report for a specified city.
+    """Retrieve current weather for a specified city using WeatherAPI.com."""
+    
+    api_key = os.getenv("WEATHERAPI_KEY")
+    if not api_key:
+        return {"status": "error", "error_message": "WEATHERAPI_KEY not set in .env file."}
 
-    Args:
-        city (str): The name of the city (e.g., "New York", "London", "Tokyo").
+    url = f"http://api.weatherapi.com/v1/current.json?key={api_key}&q={city}"
 
-    Returns:
-        dict: A dictionary containing the weather information.
-              Includes a 'status' key ('success' or 'error').
-              If 'success', includes a 'report' key with weather details.
-              If 'error', includes an 'error_message' key.
-    """
-    city_normalized = city.lower().replace(" ", "")
-    mock_weather_db = {
-        "newyork": {"status": "success", "report": "The weather in New York is sunny with a temperature of 25°C."},
-        "london": {"status": "success", "report": "It's cloudy in London with a temperature of 15°C."},
-        "tokyo": {"status": "success", "report": "Tokyo is experiencing light rain and a temperature of 18°C."},
-    }
-    if city_normalized in mock_weather_db:
-        return mock_weather_db[city_normalized]
-    else:
-        return {"status": "error", "error_message": f"Sorry, I don't have weather information for '{city}'."}
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        data = response.json()
 
+        current = data.get("current", {})
+        condition = current.get("condition", {}).get("text")
+        temp_c = current.get("temp_c")
+
+        if condition and temp_c is not None:
+            report = f"The weather in {city.capitalize()} is {condition} with a temperature of {temp_c}°C."
+            return {"status": "success", "report": report}
+        else:
+            return {"status": "error", "error_message": "Unexpected API response structure."}
+
+    except requests.exceptions.RequestException as e:
+        return {"status": "error", "error_message": str(e)}
+    except Exception as e:
+        return {"status": "error", "error_message": f"Unexpected error: {e}"}
+    
 def say_hello(name: Optional[str] = None) -> str:
     """Provides a simple greeting. If a name is provided, it will be used.
 
@@ -44,30 +54,3 @@ def say_hello(name: Optional[str] = None) -> str:
 def say_goodbye() -> str:
     """Provides a simple farewell message to conclude the conversation."""
     return "Goodbye! Have a great day."
-
-def get_weather_stateful(city: str, tool_context: ToolContext) -> dict:
-    """Retrieves weather, converts temp unit based on session state."""
-    preferred_unit = tool_context.state.get("user_preference_temperature_unit", "Celsius")
-    city_normalized = city.lower().replace(" ", "")
-    mock_weather_db = {
-        "newyork": {"temp_c": 25, "condition": "sunny"},
-        "london": {"temp_c": 15, "condition": "cloudy"},
-        "tokyo": {"temp_c": 18, "condition": "light rain"},
-    }
-    if city_normalized in mock_weather_db:
-        data = mock_weather_db[city_normalized]
-        temp_c = data["temp_c"]
-        condition = data["condition"]
-        if preferred_unit == "Fahrenheit":
-            temp_value = (temp_c * 9/5) + 32
-            temp_unit = "°F"
-        else:
-            temp_value = temp_c
-            temp_unit = "°C"
-        report = f"The weather in {city.capitalize()} is {condition} with a temperature of {temp_value:.0f}{temp_unit}."
-        result = {"status": "success", "report": report}
-        tool_context.state["last_city_checked_stateful"] = city
-        return result
-    else:
-        error_msg = f"Sorry, I don't have weather information for '{city}'."
-        return {"status": "error", "error_message": error_msg}

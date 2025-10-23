@@ -1,3 +1,5 @@
+protobuf
 google-adk
 google-genai
 asyncio
+dotenv

@@ -1,24 +1,26 @@
-# Agent Team Weather Assistant
+# Agent Team Assistant
 
-This project implements a multi-agent weather assistant system using Google ADK (Agent Development Kit). The system features a team of specialized agents that handle weather queries, greetings, farewells, and includes guardrails for input and tool usage.
+This project implements a multi-agent assistant system using Google ADK (Agent Development Kit). The system features a team of specialized agents that handle weather queries, poem requests, greetings, and farewells.
 
 ## Project Structure
 
-The monolithic code has been refactored into modular components for better maintainability and scalability:
+The project is organized into modular components for better maintainability and scalability:
 
 ```
 agent_team/
 ├── README.md              # This file
+├── .env                   # Environment variables (API keys)
+├── .gitignore             # Git ignore rules
+├── .venv/                 # Virtual environment
 ├── config.py              # Configuration, imports, and constants
 ├── tools.py               # Tool function definitions
 ├── agents.py              # Agent definitions and configurations
 ├── sessions.py            # Session service setup and management
 ├── interactions.py        # Interaction functions and conversation logic
-├── guardrails.py          # Guardrail callback functions
-├── main.py                # Main entry point (refactored)
-├── main_full.py           # Full script version with all code inline
-├── main.ipynb             # Jupyter notebook version
-└── requirements.txt       # Python dependencies
+├── main.py                # Main entry point
+├── main.ipynb             # Jupyter notebook version with examples
+├── requirements.txt       # Python dependencies
+└── __pycache__/           # Python cache files
 ```
 
 ## File Descriptions
@@ -34,47 +36,36 @@ agent_team/
 ### tools.py
 - **Purpose**: Defines all tool functions used by agents.
 - **Key Components**:
-  - `get_weather()`: Basic weather retrieval tool
+  - `get_weather()`: Weather retrieval tool using WeatherAPI.com for real weather data
   - `say_hello()`: Greeting tool with optional name parameter
   - `say_goodbye()`: Farewell tool
-  - `get_weather_stateful()`: State-aware weather tool that respects user preferences
 
 ### agents.py
 - **Purpose**: Contains all agent definitions and configurations.
 - **Key Components**:
-  - `weather_agent`: Basic weather agent
-  - `greeting_agent`: Specialized greeting agent
-  - `farewell_agent`: Specialized farewell agent
-  - `weather_agent_team`: Root agent coordinating sub-agents
-  - Various stateful and guardrail-enhanced agent versions
+  - `weather_agent`: Specialized agent for weather queries
+  - `poem_agent`: Specialized agent for poem requests
+  - `agent_team`: Root agent coordinating sub-agents for weather, poems, greetings, and farewells
 
 ### sessions.py
-- **Purpose**: Manages session services and state initialization.
+- **Purpose**: Manages session services and runners.
 - **Key Components**:
   - `InMemorySessionService` setup
-  - Session creation functions
-  - Stateful session initialization with user preferences
+  - Session creation and runner initialization
 
 ### interactions.py
-- **Purpose**: Handles user-agent interactions and conversation execution.
+- **Purpose**: Handles user-agent interactions asynchronously.
 - **Key Components**:
   - `call_agent_async()`: Core function for sending queries to agents
-  - Various conversation functions (`run_conversation`, `run_team_conversation`, etc.)
-  - State inspection utilities
-
-### guardrails.py
-- **Purpose**: Defines callback functions for input and tool guardrails.
-- **Key Components**:
-  - `block_keyword_guardrail()`: Blocks queries containing specific keywords
-  - `block_paris_tool_guardrail()`: Blocks weather queries for specific cities
+  - `run_conversation()`: Interactive conversation loop
 
 ### main.py
-- **Purpose**: Serves as the main entry point for the application.
-- **Function**: Imports from all modules and provides a simple interface to run the system.
+- **Purpose**: Main entry point for the application.
+- **Function**: Runs the interactive conversation with the agent team.
 
-### main_full.py
-- **Purpose**: Contains the full monolithic script with all code inline.
-- **Function**: Self-contained version for easy execution without modular imports.
+### main.ipynb
+- **Purpose**: Jupyter notebook with comprehensive examples and tutorials.
+- **Function**: Demonstrates various agent configurations, tools, and conversation scenarios.
 
 ## System Initialization Flow
 
@@ -130,17 +121,16 @@ agent_team/
 
 The system operates as a conversational AI assistant with the following capabilities:
 
-1. **Weather Information**: Provides weather reports for cities using mock data
-2. **State Awareness**: Remembers user preferences (e.g., temperature units) across sessions
-3. **Multi-Agent Coordination**: Delegates tasks to specialized sub-agents
-4. **Guardrails**: Prevents certain inputs or tool usages for safety/compliance
-5. **Session Persistence**: Maintains conversation context and state
+1. **Weather Information**: Provides real-time weather reports for cities using WeatherAPI.com
+2. **Poem Generation**: Creates or recites poems based on user requests
+3. **Greetings and Farewells**: Handles polite interactions using dedicated tools
+4. **Multi-Agent Coordination**: Delegates tasks to specialized sub-agents (weather_agent, poem_agent)
 
 ### Key Features:
 - Asynchronous execution using `asyncio`
 - Modular agent architecture with sub-agent delegation
-- Stateful conversations with persistent user preferences
-- Input and tool-level guardrails for content control
+- Real weather data integration via API
+- Interactive conversation loop in the terminal
 - Extensible tool system for adding new capabilities
 
 ## Usage
@@ -151,19 +141,11 @@ cd agent_team
 python main.py
 ```
 
-### Running Specific Conversations:
-Modify `main.py` to call desired conversation functions:
-- `run_conversation()`: Basic weather agent
-- `run_team_conversation()`: Multi-agent team
-- `run_stateful_conversation()`: State-aware interactions
-- `run_guardrail_test_conversation()`: Test input guardrails
-- `run_tool_guardrail_test()`: Test tool guardrails
-
 ### Configuration:
-- Set your Google API key in `config.py`
-- Adjust model constants for different LLM providers
-- Modify tool logic in `tools.py` for real weather data integration
-- Customize guardrail rules in `guardrails.py`
+- Set your Google API key in `.env` file (GOOGLE_API_KEY)
+- Set your WeatherAPI key in `.env` file (WEATHERAPI_KEY)
+- Adjust model constants in `config.py` for different LLM providers
+- Modify tool logic in `tools.py` for custom integrations
 
 ## Dependencies
 
@@ -173,16 +155,15 @@ See `requirements.txt` for Python package requirements. Key dependencies:
 
 ## Testing
 
-The refactored code maintains full compatibility with the original monolithic version. All conversation scenarios and edge cases should produce identical results. For testing:
-1. Compare outputs between `main.py` and `main_full.py`
-2. Verify state persistence across sessions
-3. Test guardrail blocking behavior
-4. Confirm sub-agent delegation works correctly
+The system can be tested by running the interactive conversation loop and trying various queries:
+- Weather queries: "What's the weather in London?"
+- Poem requests: "Can you recite a poem?"
+- Greetings: "Hello" or "Hi there"
+- Farewells: "Goodbye" or "See you later"
 
 ## Future Enhancements
 
-- Integrate real weather APIs
-- Add more specialized sub-agents
-- Implement persistent storage (database instead of in-memory)
-- Expand guardrail capabilities
+- Add more specialized sub-agents for additional tasks
+- Implement persistent storage for conversation history
 - Add user authentication and multi-user support
+- Expand capabilities with more tools and integrations
