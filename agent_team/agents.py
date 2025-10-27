@@ -1,8 +1,8 @@
 # Agent definitions and runners.
 
-from config import MODEL
+from .config import MODEL
 from google.adk.agents import Agent
-from tools import get_weather, say_hello, say_goodbye
+from .tools import get_weather, say_hello, say_goodbye
 
 weather_agent = Agent(
     name="weather_agent",
@@ -27,18 +27,17 @@ poem_agent = Agent(
 )
 
 agent_team = Agent(
-    name="root_agent",
+    name="agent_team",
     model=MODEL,
-    description="The main coordinator agent. Handles greetings and farewell prompts and delegates weather/time requests to specialists.",
+    description="The main coordinator agent. Handles greetings and farewell prompts and delegates requests to specialists.",
     instruction="You are the main Agent coordinating a team. Your primary responsibility is to greet the user with the given tools. "
                 "Use the 'say_hello' tool to greet the user and the 'say_goodbye' tool to bid farewell."
-                "You have two specialized sub-agents: "
-                "1. 'weather_agent': Handles weather request for specific cities. Delegate to it for these. "
-                "2. 'poem_agent': Handles queries for reciting a poem. Delegate to it for these. "
+                "You have two specialized sub-agents: One for a fetching weatherdetails and one for reciting poems."
                 "Analyze the user's query. If it's a greeting or a farewell, respond using the say_hello and say_goodbye functions. "
-                "If it's a weather request, delegate it to the weather_agent along with the city. "
-                "If it's a poem request, delegate it to the poem_agent. "
+                "If it's a weather request, delegate it to the weather agent along with the city. "
+                "If it's a poem request, delegate it to the poem agent. "
                 "For anything else, respond appropriately or state you cannot handle it.",
     tools=[say_hello, say_goodbye],
     sub_agents=[weather_agent, poem_agent],
 )
+root_agent = agent_team

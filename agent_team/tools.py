@@ -46,9 +46,9 @@ def say_hello(name: Optional[str] = None) -> str:
         str: A friendly greeting message.
     """
     if name:
-        greeting = f"Hello, {name}!"
+        greeting = f"Hello, {name}! How can help you today"
     else:
-        greeting = "Hello there!"
+        greeting = "Hello there! How can I help you?"
     return greeting
 
 def say_goodbye() -> str:

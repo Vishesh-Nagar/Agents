@@ -3,7 +3,7 @@
 import asyncio
 from google.adk.sessions import InMemorySessionService
 from google.adk.runners import Runner
-from agents import agent_team
+from .agents import agent_team
 
 session_service = InMemorySessionService()
 
@@ -21,6 +21,3 @@ async def setup_session():
 
 # Runner will be created after agents are imported
 runner = Runner(agent=agent_team, session_service=session_service, app_name=APP_NAME)
-
-# Create a session for the runner
-asyncio.run(session_service.create_session(app_name=APP_NAME, user_id="user", session_id="session"))
