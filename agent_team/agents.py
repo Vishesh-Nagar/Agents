@@ -1,5 +1,6 @@
 # Agent definitions and runners.
 
+import logging
 from .config import MODEL
 from google.adk.agents import Agent
 from .tools import get_weather, say_hello, say_goodbye
@@ -41,3 +42,8 @@ agent_team = Agent(
     sub_agents=[weather_agent, poem_agent],
 )
 root_agent = agent_team
+
+# Log when agents are called
+logging.info("weather_agent initialized")
+logging.info("poem_agent initialized")
+logging.info("agent_team (root_agent) initialized")

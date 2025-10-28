@@ -5,7 +5,7 @@ import warnings
 from dotenv import load_dotenv
 
 warnings.filterwarnings("ignore")
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 

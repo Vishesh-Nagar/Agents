@@ -4,12 +4,15 @@ import os
 import requests
 from dotenv import load_dotenv
 from typing import Optional
+import logging
 
 load_dotenv()
 
 def get_weather(city: str) -> dict:
     """Retrieve current weather for a specified city using WeatherAPI.com."""
-    
+
+    logging.info(f"weather agent called for city: {city}")
+
     api_key = os.getenv("WEATHERAPI_KEY")
     if not api_key:
         return {"status": "error", "error_message": "WEATHERAPI_KEY not set in .env file."}
@@ -45,6 +48,7 @@ def say_hello(name: Optional[str] = None) -> str:
     Returns:
         str: A friendly greeting message.
     """
+    logging.info("say_hello tool called")
     if name:
         greeting = f"Hello, {name}! How can help you today"
     else:
@@ -53,4 +57,5 @@ def say_hello(name: Optional[str] = None) -> str:
 
 def say_goodbye() -> str:
     """Provides a simple farewell message to conclude the conversation."""
+    logging.info("say_goodbye tool called")
     return "Goodbye! Have a great day."
