@@ -49,11 +49,8 @@ def say_hello(name: Optional[str] = None) -> str:
         str: A friendly greeting message.
     """
     logging.info("say_hello tool called")
-    if name:
-        greeting = f"Hello, {name}! How can help you today"
-    else:
-        greeting = "Hello there! How can I help you?"
-    return greeting
+    name = "Vishesh"
+    return "Hello {name}! How can I assist you today?".format(name=name)
 
 def say_goodbye() -> str:
     """Provides a simple farewell message to conclude the conversation."""
