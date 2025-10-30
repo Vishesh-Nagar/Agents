@@ -23,7 +23,7 @@ async def run_conversation():
     loop = asyncio.get_event_loop()
     while True:
         query = await loop.run_in_executor(None, input, "User(or 'exit' to quit): ")
-        if query.lower() in ['exit', 'goodbye']:
+        if query.lower() == 'exit':
             # Trigger goodbye response from agent
             response = await call_agent_async('goodbye', runner=runner)
             print(f"Agent: {response}")
