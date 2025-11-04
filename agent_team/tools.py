@@ -61,3 +61,44 @@ def say_goodbye() -> str:
     """Provides a simple farewell message to conclude the conversation."""
     logging.info("say_goodbye tool called")
     return "Goodbye! Have a great day."
+
+def translate_english_to_spanish(text: str) -> dict:
+    """Translates English text to Spanish using a dictionary, with fallback indication.
+
+    Args:
+        text (str): The English text to translate.
+
+    Returns:
+        dict: A dictionary with 'translated' (str) and 'complete' (bool) keys.
+              'translated' contains the translated text, 'complete' indicates if all words were translated.
+    """
+    logging.info(f"translate_english_to_spanish called with text: {text}")
+
+    # Simple mock translations for demonstration
+    translations = {
+        "hello": "hola",
+        "world": "mundo",
+        "how are you": "cómo estás",
+        "thank you": "gracias",
+        "goodbye": "adiós",
+        "please": "por favor",
+        "yes": "sí",
+        "no": "no",
+        "i love you": "te amo",
+        "what is your name": "cuál es tu nombre",
+    }
+
+    # Simple word-by-word translation (for demo purposes)
+    words = text.lower().split()
+    translated_words = []
+    all_translated = True
+    for word in words:
+        if word in translations:
+            translated_words.append(translations[word])
+        else:
+            translated_words.append(word)  # Keep original if not found
+            all_translated = False
+
+    translated_text = " ".join(translated_words).capitalize()
+
+    return {"translated": translated_text, "complete": all_translated}

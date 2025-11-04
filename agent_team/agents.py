@@ -3,7 +3,7 @@
 import logging
 from .config import MODEL
 from google.adk.agents import Agent
-from .tools import get_weather, say_hello, say_goodbye
+from .tools import get_weather, say_hello, say_goodbye, translate_english_to_spanish
 
 weather_agent = Agent(
     name="weather_agent",
@@ -27,23 +27,36 @@ poem_agent = Agent(
     tools=[],
 )
 
+translation_agent = Agent(
+    name="translation_agent",
+    model=MODEL,
+    description="Translates English sentences to Spanish.",
+    instruction="You are a translation assistant. "
+                "When the user provides an English sentence to translate, first use the 'translate_english_to_spanish' tool to attempt the translation. "
+                "If the tool indicates that the translation is not complete (some words were not translated), use your language model capabilities to provide a complete translation. "
+                "Provide only the Spanish translation without additional commentary.",
+    tools=[translate_english_to_spanish],
+)
+
 agent_team = Agent(
     name="agent_team",
     model=MODEL,
     description="The main coordinator agent. Handles greetings and farewell prompts and delegates requests to specialists.",
     instruction="You are the main Agent coordinating a team. Your primary responsibility is to greet the user with the given tools. "
                 "Use the 'say_hello' tool to greet the user and the 'say_goodbye' tool to bid farewell."
-                "You have two specialized sub-agents: One for a fetching weatherdetails and one for reciting poems."
+                "You have three specialized sub-agents: One for fetching weather details, one for reciting poems, and one for translating English to Spanish."
                 "Analyze the user's query. If it's a greeting or a farewell, respond using the say_hello and say_goodbye functions. "
                 "If it's a weather request, delegate it to the weather agent along with the city. "
                 "If it's a poem request, delegate it to the poem agent. "
+                "If it's a translation request (e.g., translate English to Spanish), delegate it to the translation agent. "
                 "For anything else, respond appropriately or state you cannot handle it.",
     tools=[say_hello, say_goodbye],
-    sub_agents=[weather_agent, poem_agent],
+    sub_agents=[weather_agent, poem_agent, translation_agent],
 )
 root_agent = agent_team
 
 # Log when agents are called
 logging.info("weather_agent initialized")
 logging.info("poem_agent initialized")
+logging.info("translation_agent initialized")
 logging.info("agent_team (root_agent) initialized")
