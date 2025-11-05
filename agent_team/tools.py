@@ -57,10 +57,7 @@ def say_hello(name: Optional[str] = None) -> str:
     name = "Vishesh"
     return "Hello {name}! How can I assist you today?".format(name=name)
 
-def say_goodbye() -> str:
-    """Provides a simple farewell message to conclude the conversation."""
-    logging.info("say_goodbye tool called")
-    return "Goodbye! Have a great day."
+
 
 def translate_english_to_spanish(text: str) -> dict:
     """Translates English text to Spanish using a dictionary, with fallback indication.
