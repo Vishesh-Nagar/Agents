@@ -3,3 +3,4 @@ google-adk
 google-genai
 asyncio
 dotenv
+acp-sdk
